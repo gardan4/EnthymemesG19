@@ -1,7 +1,8 @@
 fairseq-preprocess \
   --source-lang "source" \
   --target-lang "target" \
-  --trainpref "enthymemes/train.bpe" \
-  --validpref "enthymemes/val.bpe" \
-  --destdir "enthymemes-bart/" \
+  --srcdict "gpt2_bpe/dict.txt" \
+  --trainpref "enthymemes_data_bpe/train.bpe" \
+  --validpref "enthymemes_data_bpe/val.bpe" \
+  --destdir "enthymemes_data_bin" \
   --workers 10;
