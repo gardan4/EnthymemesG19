@@ -12,3 +12,5 @@ do
     --keep-empty;
   done
 done
+
+read -p "Press any key to continue..."

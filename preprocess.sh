@@ -5,4 +5,7 @@ fairseq-preprocess \
   --trainpref "enthymemes_data_bpe/train.bpe" \
   --validpref "enthymemes_data_bpe/val.bpe" \
   --destdir "enthymemes_data_bin" \
-  --workers 10;
+  --workers 10 \
+  --joined-dictionary
+
+read -p "Press any key to continue..."
