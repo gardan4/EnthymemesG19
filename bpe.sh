@@ -6,8 +6,8 @@ do
     python -m fairseq.examples.roberta.multiprocessing_bpe_encoder \
     --encoder-json "gpt2_bpe/encoder.json" \
     --vocab-bpe "gpt2_bpe/vocab.bpe" \
-    --inputs "enthymemes_data/$SPLIT.$LANG" \
-    --outputs "enthymemes_data_bpe/$SPLIT.bpe.$LANG" \
+    --inputs "enthymemes_data_paracomet/$SPLIT.$LANG" \
+    --outputs "enthymemes_data_bpe_paracomet/$SPLIT.bpe.$LANG" \
     --workers 10 \
     --keep-empty;
   done

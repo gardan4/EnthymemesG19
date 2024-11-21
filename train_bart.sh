@@ -5,14 +5,12 @@ MAX_TOKENS=1024
 UPDATE_FREQ=16
 BART_PATH=bart.large/model.pt
 
-fairseq-train enthymemes_data_bin\
-    --log-interval 1 \
-    --log-format "simple" \
-    --batch-size 1 \
+fairseq-train enthymemes_data_bin_paracomet\
     --restore-file $BART_PATH \
     --max-tokens $MAX_TOKENS \
     --task translation \
     --source-lang source --target-lang target \
+    --truncate-source \
     --layernorm-embedding \
     --share-all-embeddings \
     --share-decoder-input-output-embed \
@@ -26,7 +24,8 @@ fairseq-train enthymemes_data_bin\
     --clip-norm 0.1 \
     --lr-scheduler polynomial_decay --lr $LR --total-num-update $TOTAL_NUM_UPDATES --warmup-updates $WARMUP_UPDATES \
     --memory-efficient-fp16 --update-freq $UPDATE_FREQ \
-    --save-dir "bart-enthymemes-paracomet1" \
+    --save-dir "bart_checkpoint_enthymemes_paracomet" \
+    --ddp-backend=no_c10d  \
     --skip-invalid-size-inputs-valid-test \
     --find-unused-parameters;
 
