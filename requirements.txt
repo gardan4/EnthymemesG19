@@ -148,3 +148,6 @@ webencodings==0.5.1
 websocket-client==1.8.0
 widgetsnbextension==4.0.10
 fairseq @ git+https://github.com/Tps-F/fairseq.git@ff08af27e302625a27d3502b0791a9367c8af0c7
+datasets
+transformers
+bert_score
