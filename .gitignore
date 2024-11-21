@@ -161,3 +161,8 @@ cython_debug/
 
 bart_checkpoint_enthymemes/
 bart_checkpoint_enthymemes_paracomet/
+
+enthymemes_data_bin/
+enthymemes_data_bin_paracomet/
+enthymemes_data_bpe/
+enthymemes_data_bpe_paracomet/

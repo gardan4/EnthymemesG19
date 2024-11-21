@@ -27,7 +27,7 @@ bsz = 32  # Increased batch size
 maxb = 200
 minb = 7
 
-with open('./D3test/ikatdataparacomet.source') as source, open('./D3test/ikatdataparacomet.hypo', 'w') as fout:
+with open('./D13test/semevaldata.source') as source, open('./D1test/semevaldata.hypo', 'w') as fout:
     slines = []
     for sline in source:
         slines.append(sline.strip())
