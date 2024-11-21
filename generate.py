@@ -4,15 +4,19 @@ import os
 import time
 import numpy as np
 
-datadir = 'enthymemes-bart'
-cpdir = 'PARACOMET1/'
+#print device
+print(torch.cuda.current_device())
+
+datadir = 'enthymemes_data'
+cpdir = 'bart-enthymemes-paracomet1/'
 bart = BARTModel.from_pretrained(
     cpdir,
-    checkpoint_file='checkpoint_best.pt',
+    checkpoint_file='checkpoint50.pt',
     data_name_or_path=datadir
 )
 
 # Move the model to GPU and print device information
+
 bart.cuda()
 print(f"Model is on device: {next(bart.parameters()).device}")
 bart.eval()
@@ -23,7 +27,7 @@ bsz = 32  # Increased batch size
 maxb = 200
 minb = 7
 
-with open('./ikatdataparacomet.source') as source, open('./ikatdataparacomet.hypo', 'w') as fout:
+with open('./D3test/ikatdataparacomet.source') as source, open('./D3test/ikatdataparacomet.hypo', 'w') as fout:
     slines = []
     for sline in source:
         slines.append(sline.strip())
