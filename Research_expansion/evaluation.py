@@ -27,7 +27,8 @@ def main():
     # Define explicit pairs of hypothesis and target files
     # Format: (hypothesis_file_path, target_file_path, source_file_path)
     file_pairs = [
-        ("./semevaldata.hypo", "../Datasets/D1test/semevaldata.target", "../Datasets/D1test/semevaldata.source")
+        ("./semevaldata.hypo", "../Datasets/D1test/semevaldata.target", "../Datasets/D1test/semevaldata.source"),
+        ("./semevaldata_fewshot.hypo", "../Datasets/D1test/semevaldata.target", "../Datasets/D1test/semevaldata.source")
     ]
 
     # Output CSV file to store evaluation results
