@@ -1,73 +1,132 @@
-import sys
-from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-from bert_score import score
+import torch
+import evaluate
+import os
+import csv
+from tqdm import tqdm
 
 
-def load_file(file_path):
- """
- Load lines from a file and return as a list of stripped strings.
- Handles encoding issues by falling back to a different encoding.
- """
- try:
-  with open(file_path, 'r', encoding='utf-8') as f:
-   return [line.strip() for line in f.readlines()]
- except UnicodeDecodeError:
-  print(f"Failed to read {file_path} with UTF-8. Trying ISO-8859-1 encoding.")
-  with open(file_path, 'r', encoding='ISO-8859-1') as f:
-   return [line.strip() for line in f.readlines()]
-
-def compute_bleu(reference_texts, hypothesis_texts):
+def load_texts(file_path, source_file_path):
     """
-    Compute BLEU-1 and BLEU-2 scores.
+    Load texts from a file and return as a list of stripped strings.
     """
-    smoothing = SmoothingFunction().method1
-    bleu1_scores = []
-    bleu2_scores = []
+    with open(file_path, 'r', encoding='utf-8') as f:
+        # Also read source file to get the source text
+        with open(source_file_path, 'r', encoding='utf-8') as f_source:
+            line = [line.strip() for line in f.readlines()]
+            line_source = [line.strip() for line in f_source.readlines()]
+            # The source line contains a #; save the content before and after the # in two variables
+            line_source = [line.split('#') for line in line_source]
+            # Remove both elements of the list line_source from the line of the hypothesis
+            for i in range(len(line_source)):
+                line[i] = line[i].replace(line_source[i][0], '')
+                line[i] = line[i].replace(line_source[i][1], '')
+        return line
 
-    for ref, hypo in zip(reference_texts, hypothesis_texts):
-        reference = [ref.split()]
-        candidate = hypo.split()
-
-        bleu1 = sentence_bleu(reference, candidate, weights=(1, 0, 0, 0), smoothing_function=smoothing)
-        bleu2 = sentence_bleu(reference, candidate, weights=(0.5, 0.5, 0, 0), smoothing_function=smoothing)
-
-        bleu1_scores.append(bleu1)
-        bleu2_scores.append(bleu2)
-
-    avg_bleu1 = sum(bleu1_scores) / len(bleu1_scores)
-    avg_bleu2 = sum(bleu2_scores) / len(bleu2_scores)
-
-    return avg_bleu1, avg_bleu2
-
-def compute_bertscore(reference_texts, hypothesis_texts):
-    """
-    Compute BERTScore.
-    """
-    P, R, F1 = score(hypothesis_texts, reference_texts, lang="en", rescale_with_baseline=True)
-    avg_bs_f1 = F1.mean().item()
-    return avg_bs_f1
 
 def main():
-    reference_file = "../Datasets/D1test/semevaldata.target"
-    hypothesis_file = "./semevaldata.hypo"
+    # Define explicit pairs of hypothesis and target files
+    # Format: (hypothesis_file_path, target_file_path, source_file_path)
+    file_pairs = [
+        ("./semevaldata.hypo", "../Datasets/D1test/semevaldata.target", "../Datasets/D1test/semevaldata.source")
+    ]
 
-    # Load files
-    reference_texts = load_file(reference_file)
-    hypothesis_texts = load_file(hypothesis_file)
+    # Output CSV file to store evaluation results
+    output_csv = 'evaluation_results.csv'
 
-    if len(reference_texts) != len(hypothesis_texts):
-        raise ValueError("The number of lines in the reference and hypothesis files must be the same.")
+    # Initialize metrics
+    bleu = evaluate.load('bleu')
+    bertscore = evaluate.load('bertscore')
+    rouge = evaluate.load('rouge')  # Optional, if ROUGE is desired
 
-    # Compute BLEU scores
-    bleu1, bleu2 = compute_bleu(reference_texts, hypothesis_texts)
+    # Prepare CSV header
+    csv_header = ['Filename', 'BLEU-1', 'BLEU-2',
+                  'ROUGE-1', 'ROUGE-2', 'ROUGE-L',
+                  'BERTScore Precision', 'BERTScore Recall', 'BERTScore F1']
 
-    # Compute BERTScore
-    bertscore_f1 = compute_bertscore(reference_texts, hypothesis_texts)
+    # Open CSV file for writing
+    with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(csv_header)
 
-    # Print results
-    print(f"BLEU-1: {bleu1:.4f}")
-    print(f"BLEU-2: {bleu2:.4f}")
-    print(f"BERTScore (F1): {bertscore_f1:.4f}")
+        print(f"Starting evaluation of {len(file_pairs)} file pairs.\n")
 
-if __name__ == "__main__":
-    main()
+        # Iterate over each file pair with a progress bar
+        for hypo_path, target_path, source_path in tqdm(file_pairs, desc="Evaluating file pairs"):
+            # Extract filename from the hypothesis file path
+            hypo_filename = os.path.basename(hypo_path)
+
+            # Check if both files exist
+            if not os.path.exists(hypo_path):
+                print(f"Hypothesis file not found: {hypo_path}. Skipping.")
+                continue
+            if not os.path.exists(target_path):
+                print(f"Target file not found: {target_path}. Skipping.")
+                continue
+
+            # Load texts
+            generated_hypo_texts = load_texts(hypo_path, source_path)
+            target_texts = load_texts(target_path, source_path)
+
+            # Validate that all datasets have the same number of samples
+            if len(target_texts) != len(generated_hypo_texts):
+                print(f"Line count mismatch between hypothesis and target for {hypo_filename}. Skipping.")
+                continue  # Skip if line counts do not match
+
+            # Compute BLEU-1
+            bleu1 = bleu.compute(
+                predictions=generated_hypo_texts,
+                references=[[ref] for ref in target_texts],
+                max_order=1
+            )
+
+            # Compute BLEU-2
+            bleu2 = bleu.compute(
+                predictions=generated_hypo_texts,
+                references=[[ref] for ref in target_texts],
+                max_order=2
+            )
+
+            # Compute ROUGE
+            ro = rouge.compute(
+                predictions=generated_hypo_texts,
+                references=target_texts,
+                use_stemmer=True
+            )
+
+            # Compute BERTScore
+            bs = bertscore.compute(
+                predictions=generated_hypo_texts,
+                references=target_texts,
+                lang='en',
+                model_type='bert-base-uncased',
+                verbose=False
+            )
+
+            # Calculate average BERTScore metrics
+            bert_precision = sum(bs['precision']) / len(bs['precision']) * 100
+            bert_recall = sum(bs['recall']) / len(bs['recall']) * 100
+            bert_f1 = sum(bs['f1']) / len(bs['f1']) * 100
+
+            # Write results to CSV
+            writer.writerow([
+                hypo_filename,
+                f"{bleu1['bleu'] * 100:.2f}",
+                f"{bleu2['bleu'] * 100:.2f}",
+                f"{ro['rouge1'] * 100:.2f}",
+                f"{ro['rouge2'] * 100:.2f}",
+                f"{ro['rougeL'] * 100:.2f}",
+                f"{bert_precision:.2f}",
+                f"{bert_recall:.2f}",
+                f"{bert_f1:.2f}"
+            ])
+
+            # Print summary for this pair
+            print(f"Evaluated {hypo_filename}: BLEU-1={bleu1['bleu'] * 100:.2f}, BLEU-2={bleu2['bleu'] * 100:.2f}, "
+                  f"ROUGE-1={ro['rouge1'] * 100:.2f}, ROUGE-2={ro['rouge2'] * 100:.2f}, ROUGE-L={ro['rougeL'] * 100:.2f}, "
+                  f"BERTScore F1={bert_f1:.2f}")
+
+        print(f"\nEvaluation completed. Results saved to {output_csv}.")
+
+
+# Execute the evaluation
+main()

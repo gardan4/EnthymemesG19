@@ -1,0 +1,2 @@
+Filename,BLEU-1,BLEU-2,ROUGE-1,ROUGE-2,ROUGE-L,BERTScore Precision,BERTScore Recall,BERTScore F1
+semevaldata.hypo,12.36,3.31,15.26,1.52,11.46,45.70,49.21,47.26
