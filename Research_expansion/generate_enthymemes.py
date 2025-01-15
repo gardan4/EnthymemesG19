@@ -37,10 +37,11 @@ MODEL_LIST = [
     "Qwen/Qwen2.5-7B",
     "Qwen/Qwen2.5-14B", # if you have enough vram
     "microsoft/phi-4" # if you have enough vram
+    "Qwen/Qwen2.5-32B"
 ]
 
 # Quantization choice: "4bit", "8bit", or "none"
-QUANTIZATION_TYPE = "4bit"
+QUANTIZATION_TYPE = "8bit"
 
 # Define multiple prompts:
 PROMPTS = {
