@@ -17,6 +17,7 @@ Dependencies:
 import os
 import sys
 import torch
+from tqdm import tqdm
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
@@ -42,35 +43,47 @@ QUANTIZATION_TYPE = "4bit"
 
 # Define multiple prompts:
 PROMPTS = {
-    "zero_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
-    inserting a short connecting statement that clarifies the reason.
-    Use the information between the hashtags as a dircetion for the reason
-    Output only the final, very short single-sentence reason, with no additional commentary.
+    "CoT": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit, inserting a short connecting statement that clarifies the reason. 
+    Use the information between the hashtags as a direction for the reason. 
+    Follow these steps to think carefully before answering:
+
+    Step 1: Read and understand the sentence, identifying the main idea and the hashtag information.  
+    Step 2: Break the sentence into parts and consider how the ideas are connected.  
+    Step 3: Use the hashtag information to infer the hidden reason.  
+    Step 4: Formulate one short sentence that explicitly states the reason.  
+
+    Output only the final short sentence reason (nothing else).
 
     Original: "{sentence}"
-    Rewritten: 
-""",
+    """,
+    # "few_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
+    # inserting a short connecting statement that clarifies the reason.
+    # Use the information between the hashtags as a dircetion for the reason
+    # Output only the final, very short single-sentence reason, with no additional commentary.
 
-    "few_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
-    inserting a short connecting statement that clarifies the reason.
-    Use the information between the hashtags as a dircetion for the reason
-    Output only the final, very short single-sentence reason, with no additional commentary.
+    # Here are 2 examples:
+    # 1.  Input: "I forgot my umbrella. # it was raining # I got soaked."
+    #     Implicit premise: "and because it was raining."
 
-    Here are 2 examples:
-    1.  Input: "I forgot my umbrella. # it was raining # I got soaked."
-        Implicit premise: "and because it was raining."
+    # 2.  Input: "Interns are replacing employees. # to have a better job # Unpaid internship exploit college students
+    #     Implicit premise: And since that helps the company's bottom line.
 
-    2.  Input: "Interns are replacing employees. # to have a better job # Unpaid internship exploit college students
-        Implicit premise: And since that helps the company's bottom line.
+    # Original: "{sentence}"
+    # Rewritten: 
+    # """,
+    # "zero_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
+    # #     inserting a short connecting statement that clarifies the reason.
+    # #     Use the information between the hashtags as a dircetion for the reason
+    # #     Output only the final, very short single-sentence reason, with no additional commentary.
 
-    Original: "{sentence}"
-    Rewritten: 
-""",
+    # #     Original: "{sentence}"
+    # #     Rewritten: 
+    # # """,
 }
 
 # Generation hyperparams (tweak as desired)
 GEN_KWARGS = {
-    "max_new_tokens": 3000,
+    "max_new_tokens": 1000,
     "num_return_sequences": 1,
     "do_sample": True,
     "top_p": 0.9,
@@ -180,7 +193,7 @@ def main():
             out_filename = f"{safe_model_name}_{prompt_name}.hypo"
 
             with open(out_filename, 'w', encoding='utf-8') as out_f:
-                for line_idx, source_line in enumerate(lines):
+                for line_idx, source_line in enumerate(tqdm(lines, desc="Processing lines")):
                     # Format the prompt
                     prompt_text = prompt_template.format(sentence=source_line)
 
@@ -192,8 +205,6 @@ def main():
 
                     # Write only the final sentence
                     out_f.write(final_sentence.strip() + "\n")
-
-            print(f"    -> Results written to {out_filename}")
 
     print("\nAll model+prompt combinations processed.")
 
