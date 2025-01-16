@@ -35,40 +35,37 @@ SOURCE_FILE = "Datasets/D1test/semevaldataparacomet.source"
 MODEL_LIST = [
     # Example: a non-quantized model that we can quantize with bitsandbytes if desired.
     "Qwen/Qwen2.5-7B",
-    "Qwen/Qwen2.5-14B", # if you have enough vram
-    "microsoft/phi-4" # if you have enough vram
-    "Qwen/Qwen2.5-32B"
 ]
 
 # Quantization choice: "4bit", "8bit", or "none"
-QUANTIZATION_TYPE = "8bit"
+QUANTIZATION_TYPE = "4bit"
 
 # Define multiple prompts:
 PROMPTS = {
-    "zero_shot": """The line first has a sentence followed by one or more implicit premises. Create a concise sentence by incorporating 
-    the implicit premises with the sentence. Only provide me with the result that is one sentence without any additional information. Here is the line: "{sentence}"
+    "zero_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
+    inserting a short connecting statement that clarifies the reason.
+    Use the information between the hashtags as a dircetion for the reason
+    Output only the final, very short single-sentence reason, with no additional commentary.
+
+    Original: "{sentence}"
+    Rewritten: 
 """,
 
-    "few_shot": """Below is an example of rewriting a sentence to make the hidden reason explicit.
+    "few_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
+    inserting a short connecting statement that clarifies the reason.
+    Use the information between the hashtags as a dircetion for the reason
+    Output only the final, very short single-sentence reason, with no additional commentary.
 
-    Example:
-    Input: "I forgot my umbrella. # it was raining # I got soaked."
-    Rewrite: "I forgot my umbrella, and because it was raining, I ended up getting soaked."
+    Here are 2 examples:
+    1.  Input: "I forgot my umbrella. # it was raining # I got soaked."
+        Implicit premise: "and because it was raining."
 
-    Now do the same for the following input.
-    Output the one final rewritten sentence directly after outputting a newline.
+    2.  Input: "Interns are replacing employees. # to have a better job # Unpaid internship exploit college students
+        Implicit premise: And since that helps the company's bottom line.
 
-    Input: "{sentence}"
-    Rewrite:
+    Original: "{sentence}"
+    Rewritten: 
 """,
-
-    "reasoning": """You have a sentence that has an implied reason indicated by '#'.
-    Your task is to rewrite the sentence to explicitly state that reason in one concise sentence.
-    Output the one final rewritten sentence directly after outputting a newline.
-
-    Sentence: "{sentence}"
-    Rewrite:
-"""
 }
 
 # Generation hyperparams (tweak as desired)
@@ -195,7 +192,6 @@ def main():
 
                     # Write only the final sentence
                     out_f.write(final_sentence.strip() + "\n")
-                    out_f.write("="*50 + "\n")
 
             print(f"    -> Results written to {out_filename}")
 
