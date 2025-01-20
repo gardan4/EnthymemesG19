@@ -3,20 +3,17 @@ WARMUP_UPDATES=500
 LR=3e-05
 MAX_TOKENS=1024
 UPDATE_FREQ=16
-BART_PATH=bart.large/model.pt
+MBART_PATH=mbart.large/model.pt
 
 fairseq-train enthymemes_data_bin_paracomet\
-    --restore-file $BART_PATH \
+    --restore-file $MBART_PATH \
     --max-tokens $MAX_TOKENS \
     --task translation \
     --source-lang source --target-lang target \
-    --truncate-source \
     --layernorm-embedding \
-    --share-all-embeddings \
-    --share-decoder-input-output-embed \
     --reset-optimizer --reset-dataloader --reset-meters \
     --required-batch-size-multiple 1 \
-    --arch bart_large \
+    --arch mbart_large \
     --criterion label_smoothed_cross_entropy \
     --label-smoothing 0.1 \
     --dropout 0.1 --attention-dropout 0.1 \

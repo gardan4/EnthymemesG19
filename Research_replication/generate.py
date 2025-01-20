@@ -108,8 +108,7 @@ def main():
     # Define models and source files
     # Each model is a tuple of (cpdir, checkpoint_file)
     models = [
-        ("bart_checkpoint_enthymemes", "checkpoint50.pt"),
-        ("bart_checkpoint_enthymemes_paracomet", "checkpoint16.pt")
+        ("bart_checkpoint_enthymemes_paracomet", "checkpoint50.pt")
     ]
 
     # List of source files
