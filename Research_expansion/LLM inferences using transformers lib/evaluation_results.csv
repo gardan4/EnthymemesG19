@@ -1,0 +1,2 @@
+Model,Source File,BLEU-1,BLEU-2,ROUGE-1,ROUGE-2,ROUGE-L,BERTScore Precision,BERTScore Recall,BERTScore F1
+Qwen_Qwen2.5-3B_CoT.hypo,41.33,33.35,45.93,31.40,40.02,64.35,63.84,63.90

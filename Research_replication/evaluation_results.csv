@@ -1,1 +1,4 @@
 Model,Source File,BLEU-1,BLEU-2,ROUGE-1,ROUGE-2,ROUGE-L,BERTScore Precision,BERTScore Recall,BERTScore F1
+checkpoint16,ikatdataparacomet,17.04,9.64,26.13,9.75,20.94,48.00,58.03,52.27
+checkpoint16,jandataparacomet,7.67,3.50,23.75,5.97,16.64,47.36,41.22,43.98
+checkpoint16,semevaldataparacomet,16.33,8.58,22.45,8.12,18.90,46.30,52.98,49.12
