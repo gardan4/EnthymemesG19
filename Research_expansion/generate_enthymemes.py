@@ -35,7 +35,7 @@ SOURCE_FILE = "Datasets/D1test/semevaldataparacomet.source"
 # List of model names or paths
 MODEL_LIST = [
     # Example: a non-quantized model that we can quantize with bitsandbytes if desired.
-    "Qwen/Qwen2.5-7B",
+    "Qwen/Qwen2.5-3B",
 ]
 
 # Quantization choice: "4bit", "8bit", or "none"
