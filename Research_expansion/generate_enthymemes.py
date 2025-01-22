@@ -56,29 +56,29 @@ PROMPTS = {
 
     Original: "{sentence}"
     """,
-    # "few_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
-    # inserting a short connecting statement that clarifies the reason.
-    # Use the information between the hashtags as a dircetion for the reason
-    # Output only the final, very short single-sentence reason, with no additional commentary.
+    "few_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
+    inserting a short connecting statement that clarifies the reason.
+    Use the information between the hashtags as a dircetion for the reason
+    Output only the final, very short single-sentence reason, with no additional commentary.
 
-    # Here are 2 examples:
-    # 1.  Input: "I forgot my umbrella. # it was raining # I got soaked."
-    #     Implicit premise: "and because it was raining."
+    Here are 2 examples:
+    1.  Input: "I forgot my umbrella. # it was raining # I got soaked."
+        Implicit premise: "and because it was raining."
 
-    # 2.  Input: "Interns are replacing employees. # to have a better job # Unpaid internship exploit college students
-    #     Implicit premise: And since that helps the company's bottom line.
+    2.  Input: "Interns are replacing employees. # to have a better job # Unpaid internship exploit college students
+        Implicit premise: And since that helps the company's bottom line.
 
-    # Original: "{sentence}"
-    # Rewritten: 
-    # """,
-    # "zero_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
-    # #     inserting a short connecting statement that clarifies the reason.
-    # #     Use the information between the hashtags as a dircetion for the reason
-    # #     Output only the final, very short single-sentence reason, with no additional commentary.
+    Original: "{sentence}"
+    Rewritten: 
+    """,
+    "zero_shot": """Rewrite the following sentence to make the hidden reason (enthymeme) explicit,
+    inserting a short connecting statement that clarifies the reason.
+    Use the information between the hashtags as a dircetion for the reason
+    Output only the final, very short single-sentence reason, with no additional commentary.
 
-    # #     Original: "{sentence}"
-    # #     Rewritten: 
-    # # """,
+    Original: "{sentence}"
+    Rewritten: 
+    """,
 }
 
 # Generation hyperparams (tweak as desired)
